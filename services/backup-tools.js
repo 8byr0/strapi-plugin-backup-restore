@@ -46,16 +46,22 @@ module.exports = {
         strapi.config.database.connections[
           strapi.config.database.defaultConnection
         ];
-      const { connector, settings } = dbConnection;
-      switch (connector) {
-        case "bookshelf":
+      const { settings } = dbConnection;
+
+      switch (settings.client) {
+        case "mysql":
           await strapi.plugins["backup-restore"].services[
             "backup-tools"
           ].backupBookshelf(bundleIdentifier, settings);
           break;
+        case "sqlite3":
+          await strapi.plugins["backup-restore"].services[
+            "backup-tools"
+          ].backupSqlite3(bundleIdentifier, settings);
+          break;
         default:
           console.warn(
-            `Unhandled db connector ${connector}. Only [bookshelf] is implemented yet.`
+            `Unhandled db client ${settings.client}. Only [mysql, sqlite] are implemented yet.`
           );
       }
     }
@@ -65,10 +71,16 @@ module.exports = {
         "backup-tools"
       ].backupUploads(bundleIdentifier);
     }
+
     // Pack Backup
     const createdEntry = await strapi.plugins["backup-restore"].services[
       "backup-tools"
-    ].bundleBackup(bundleIdentifier, manual, backupDB, backupUploads);
+    ].bundleBackup({
+      bundleIdentifier,
+      manual,
+      hasDB: backupDB,
+      hasUploads: backupUploads,
+    });
 
     // Cleanup
     await fs.rmdirSync(backupTempPath, { recursive: true, force: true });
@@ -78,12 +90,12 @@ module.exports = {
       ...createdEntry,
     };
   },
-  bundleBackup: async (
+  bundleBackup: async ({
     bundleIdentifier,
     manual = true,
     hasDB = true,
-    hasUploads = true
-  ) => {
+    hasUploads = true,
+  }) => {
     const rootDir = process.cwd();
 
     const savedFile = await strapi.plugins["backup-restore"].services[
@@ -141,7 +153,7 @@ module.exports = {
       `${rootDir}/private/backups/${bundleIdentifier}/uploads.zip`
     );
 
-    return { backupPath: savedFile };
+    return { status: "success", backupPath: savedFile };
   },
   backupBookshelf: async (bundleIdentifier, settings) => {
     console.log("Starting bookshelf backup from", settings.host);
@@ -166,6 +178,25 @@ module.exports = {
       content: res,
       message: "db backup succesfully created",
       backupUrl: "https://google.com/zip",
+    };
+  },
+  backupSqlite3: async (bundleIdentifier, settings) => {
+    console.log("Starting sqlite3 backup from", settings.filename);
+    const rootDir = process.cwd();
+    const pathToDatabaseBackup = `${rootDir}/private/backups/${bundleIdentifier}/database.db`;
+    console.log("Dumping to", pathToDatabaseBackup);
+    await fs.copyFile(
+      `${rootDir}/${settings.filename}`,
+      pathToDatabaseBackup,
+      (err) => {
+        if (err) throw err;
+        console.log("Database successfully saved");
+      }
+    );
+
+    return {
+      status: "success",
+      backupPath: pathToDatabaseBackup,
     };
   },
 };
