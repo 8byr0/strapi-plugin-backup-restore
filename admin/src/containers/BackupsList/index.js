@@ -150,29 +150,25 @@ const BackupLists = ({ backups, onDelete }) => {
 
   return (
     <div>
+      <Text lineHeight="6" fontSize="sm" ellipsis>
+        This version can handle backup for <b>MySQL</b>, <b>Postgres</b> and{" "}
+        <b>Sqlite3</b>. The restore feature and mongo support will come in next
+        versions.
+      </Text>
       <Text
         textTransform="capitalize"
         lineHeight="6"
         fontWeight="bold"
-        fontSize="sm"
+        fontSize="lg"
         ellipsis
       >
-        Backups
+        Backups list
       </Text>
       <Table
         className="remove-margin"
         headers={headers}
         rows={backups}
         customRow={({ row }) => <CustomRow row={row} onDelete={onDelete} />}
-        // rowLinks={[
-        //   {
-        //     icon: <></>,
-        //     onClick: (data) => {
-        //       // onDelete(data.id);
-        //       // push(getUrl(`core/${data.coreMessageType}`));
-        //     },
-        //   },
-        // ]}
       />
     </div>
   );
