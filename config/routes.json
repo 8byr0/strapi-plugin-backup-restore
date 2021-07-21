@@ -1,0 +1,44 @@
+{
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/run-backup",
+      "handler": "backup-restore.index",
+      "config": {
+        "policies": [
+          "admin::isAuthenticatedAdmin"
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/backups",
+      "handler": "backup-manager.getBackups",
+      "config": {
+        "policies": [
+          "admin::isAuthenticatedAdmin"
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/backups/:backupId",
+      "handler": "backup-manager.getBackup",
+      "config": {
+        "policies": [
+          "admin::isAuthenticatedAdmin"
+        ]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/backups/:backupId",
+      "handler": "backup-manager.deleteBackup",
+      "config": {
+        "policies": [
+          "admin::isAuthenticatedAdmin"
+        ]
+      }
+    }
+  ]
+}

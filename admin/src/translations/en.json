@@ -1,0 +1,23 @@
+{
+  "table.createdAt": "Creation date",
+  "table.backupId": "Backup ID",
+  "table.triggerType": "Trigger type",
+  "table.hasDB": "DB included",
+  "table.hasUploads": "Uploads folder included",
+  "table.strapiVersion": "Strapi version",
+  "table.adminVersion": "Admin version",
+  "table.actions": "Actions",
+  "plugin.name": "Backup & Restore",
+  "createBackup": "Manual backup",
+  "header.description": "Easily backup your database and uploads",
+  "tooltip.download": "Download",
+  "tooltip.delete": "Delete backup",
+  "error.create_failure.title": "Backup Failure",
+  "error.create_failure.message": "Something went wrong while creating backup",
+  "error.create_success.title": "Backup Success",
+  "error.create_success.message": "Your backup is ready, you can download it from the table",
+  "error.delete_success.title": "Backup Successfully Deleted",
+  "error.delete_success.message": "Your backup has been deleted from system",
+  "delete_modal.title": "Confirm deletion",
+  "delete_modal.content": "Are you sure you want to delete this backup? THIS CANNOT BE UNDONE."
+}

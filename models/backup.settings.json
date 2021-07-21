@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "backups",
+  "info": {
+    "name": "backup"
+  },
+  "options": {
+    "draftAndPublish": false,
+    "timestamps": true,
+    "increments": true,
+    "comment": "",
+    "isManaged": false,
+    "populateCreatorFields": true
+  },
+  "attributes": {
+    "strapiVersion": {
+      "type": "string",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "adminVersion": {
+      "type": "string",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "identifier": {
+      "type": "string",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "size": {
+      "type": "number",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "manual": {
+      "type": "boolean",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "backupPath": {
+      "type": "string",
+      "private": true,
+      "configurable": false,
+      "required": true
+    },
+    "hasDB": {
+      "type": "boolean",
+      "private": true,
+      "configurable": false,
+      "default": true
+    },
+    "hasUploads": {
+      "type": "boolean",
+      "private": true,
+      "configurable": false,
+      "default": true
+    }
+  }
+}
