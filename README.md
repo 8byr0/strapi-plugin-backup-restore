@@ -6,8 +6,8 @@ Add backup and restore features directly inside your strapi admin panel.
 
 Supported databases:
 - [x] mysql
+- [x] sqlite
 - [ ] postgre (should work but not tested)
-- [ ] sqlite (should work but not tested)
 - [ ] mongodb (not implemented)
 
 ## Installation
@@ -82,9 +82,10 @@ It is a zip file where you'll find:
 ## Roadmap
 ### Backup
 - [x] Backup from mysql 
-- [ ] Backup from postgre
+- [x] Backup from postgre
 - [ ] Backup from sqlite 
 - [ ] Backup from mongodb
+- [x] Backup local uploads (from `public/uploads`)
 - [ ] Save backup to remote storage (Google drive, one drive, dropbox...) with a tool like rsync
 - [ ] Backup uploads from remote provider
 
