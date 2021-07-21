@@ -102,6 +102,6 @@ It is a zip file where you'll find:
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-> I (or any contributor) could be responsible for any data loss while using this plugin. Backup feature is quite simple and globally safe (if it fails then you only have a failed backup) but restore is more tricky and external factors involved during the process may break your installation.
+> I (or any contributor) could not be responsible for any data loss while using this plugin. Backup feature is quite simple and globally safe (if it fails then you only have a failed backup) but restore is more tricky and external factors involved during the process may break your installation.
 ### Dependencies
 There are not a lot of dump clients available on npm and I was in a hurry when creating this plugin so I picked [mysqldump](https://npmjs.com/package/mysqldump) which has not been updated since june 2020. A better implementation would be to remove that package / contribute to its development.
