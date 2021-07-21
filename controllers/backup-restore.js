@@ -15,13 +15,22 @@ module.exports = {
 
   index: async (ctx) => {
     const backupID = Date.now().toString();
-
-    const result = await strapi.plugins["backup-restore"].services[
-      "backup-tools"
-    ].runBackup(backupID);
-
-    ctx.send({
-      created: result,
-    });
+    try {
+      const result = await strapi.plugins["backup-restore"].services[
+        "backup-tools"
+      ].runBackup(backupID);
+      if (result.status === "success") {
+        ctx.send({
+          created: result.data,
+        });
+      } else {
+        ctx.send({
+          ...result,
+        });
+      }
+    } catch (err) {
+      strapi.log.error(err)
+      ctx.send({ status: "failure", message: err.toString() });
+    }
   },
 };

@@ -1,13 +1,8 @@
 import React, { memo } from "react";
-import {
-  PopUpWarning,
-  LoadingIndicator,
-  request,
-  useGlobalContext,
-  dateFormats,
-  dateToUtcTime,
-} from "strapi-helper-plugin";
+import { PopUpWarning, request, useGlobalContext } from "strapi-helper-plugin";
+import GitHubButton from "react-github-btn";
 
+import { Text } from "@buffetjs/core";
 import { Header } from "@buffetjs/custom";
 import pluginId from "../../pluginId";
 import { runBackup } from "../../utils/callApi";
@@ -87,14 +82,14 @@ const HomePage = () => {
                   });
                 } else {
                   strapi.notification.toggle({
-                    timeout: 4000,
+                    timeout: 10000,
                     type: "warning",
                     title: formatMessage({
                       id: getTrad("error.create_failure.title"),
                     }),
-                    message: formatMessage({
+                    message: `${formatMessage({
                       id: getTrad("error.create_failure.message"),
-                    }),
+                    })} - details: ${res.message}`,
                   });
                 }
               });
@@ -117,6 +112,31 @@ const HomePage = () => {
           setShowDeleteModal(true);
         }}
       />
+      {currentEnvironment !== "production" && (
+        <div>
+          <Text
+            textTransform="capitalize"
+            lineHeight="6"
+            fontWeight="bold"
+            fontSize="sm"
+            ellipsis
+          >
+            About
+          </Text>
+          <GitHubButton
+            href="https://github.com/8byr0/strapi-plugin-backup-restore"
+            data-show-count="true"
+            aria-label="Star 8byr0/strapi-plugin-backup-restore on GitHub"
+          >
+            Star
+          </GitHubButton>
+          <div>
+            This plugin is available on github, show your support by giving a
+            star! <br />
+            You can also open an issue if you face any problem.
+          </div>
+        </div>
+      )}
     </div>
   );
 };
