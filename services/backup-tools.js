@@ -217,6 +217,8 @@ module.exports = {
     };
   },
   backupPostgres: async (bundleIdentifier, settings) => {
+    const { postgres: pgConfig } = strapi.plugins["backup-restore"].config;
+
     strapi.log.info("Starting Postgres backup from", settings.host);
     const rootDir = process.cwd();
     const pathToDatabaseBackup = `${rootDir}/private/backups/${bundleIdentifier}/database.sql`;
@@ -229,15 +231,18 @@ module.exports = {
     const exec = require("child_process").exec;
     const exec_promise = util.promisify(exec);
 
-    const pathToPgDump =
-      // TODO: get this value from plugin config overrides
-      // strapi.plugins["backup-restore"].config.backup.postgres.executable ||
-      "pg_dump";
+    let pathToPgDump = "pg_dump";
+    if (pgConfig) {
+      if (pgConfig.pathToPgDump) {
+        pathToPgDump = pgConfig.pathToPgDump;
+      }
+    }
+
     if (!commandExistsSync(pathToPgDump)) {
       throw Error("pg_dump command does not exist, is it available in path?");
     }
     const pgDumpCommand = `PGPASSWORD=${settings.password} ${pathToPgDump} -U ${settings.username} -p ${settings.port} -h ${settings.host} ${settings.database} > ${pathToDatabaseBackup}`;
-    console.log(pgDumpCommand);
+
     await exec_promise(pgDumpCommand);
 
     return { status: "success", backupPath: pathToDatabaseBackup };

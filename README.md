@@ -69,13 +69,27 @@ private/backups/\*
 
 `mysqldump` command must be available in your environment.
 
-### Sqlite
+#### Sqlite
 
 Working out of the box.
 
-### Postgres
+#### Postgres
 
 `pg_dump` must be available in path. [libpq](https://stackoverflow.com/questions/44654216/correct-way-to-install-psql-without-full-postgres-on-macos) may be used to have it without a whole Postgres installation.
+
+You can manually specify pg_dump path in plugin config like so:
+
+```javascript
+// config/plugins.js
+module.exports = () => ({
+  "backup-restore": {
+    postgres: {
+      // Update with your path
+      pathToPgDump: "/usr/local/opt/libpq/bin/pg_dump",
+    },
+  },
+});
+```
 
 ### Manual backup
 
