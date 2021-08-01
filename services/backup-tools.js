@@ -241,9 +241,11 @@ module.exports = {
     if (!commandExistsSync(pathToPgDump)) {
       throw Error("pg_dump command does not exist, is it available in path?");
     }
-    const pgDumpCommand = `PGPASSWORD=${settings.password} ${pathToPgDump} -U ${settings.username} -p ${settings.port} -h ${settings.host} ${settings.database} > ${pathToDatabaseBackup}`;
+    const pgDumpCommand = `${pathToPgDump} -U ${settings.username} -p ${settings.port} -h ${settings.host} ${settings.database} > ${pathToDatabaseBackup}`;
 
-    await exec_promise(pgDumpCommand);
+    await exec_promise(pgDumpCommand, {
+      env: { PGPASSWORD: settings.password },
+    });
 
     return { status: "success", backupPath: pathToDatabaseBackup };
   },
