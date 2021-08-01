@@ -6,7 +6,12 @@
       "handler": "backup-restore.index",
       "config": {
         "policies": [
-          "admin::isAuthenticatedAdmin"
+          [
+            "admin::hasPermissions",
+            [
+              "plugins::backup-restore.createbackup"
+            ]
+          ]
         ]
       }
     },
@@ -16,7 +21,12 @@
       "handler": "backup-manager.getBackups",
       "config": {
         "policies": [
-          "admin::isAuthenticatedAdmin"
+          [
+            "admin::hasPermissions",
+            [
+              "plugins::backup-restore.listbackups"
+            ]
+          ]
         ]
       }
     },
@@ -26,7 +36,12 @@
       "handler": "backup-manager.getBackup",
       "config": {
         "policies": [
-          "admin::isAuthenticatedAdmin"
+          [
+            "admin::hasPermissions",
+            [
+              "plugins::backup-restore.downloadbackup"
+            ]
+          ]
         ]
       }
     },
@@ -36,7 +51,12 @@
       "handler": "backup-manager.deleteBackup",
       "config": {
         "policies": [
-          "admin::isAuthenticatedAdmin"
+          [
+            "admin::hasPermissions",
+            [
+              "plugins::backup-restore.deletebackup"
+            ]
+          ]
         ]
       }
     }

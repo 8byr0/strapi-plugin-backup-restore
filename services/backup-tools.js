@@ -90,6 +90,7 @@ module.exports = {
       manual,
       hasDB: backupDB,
       hasUploads: backupUploads,
+      dbEngine: settings.client,
     });
 
     // Cleanup
@@ -111,6 +112,7 @@ module.exports = {
     manual = true,
     hasDB = true,
     hasUploads = true,
+    dbEngine,
   }) => {
     const rootDir = process.cwd();
 
@@ -129,6 +131,7 @@ module.exports = {
       strapiVersion: strapi.config.info.strapi,
       adminVersion: strapi.config.info.version,
       manual,
+      dbEngine,
     });
 
     return {
@@ -142,6 +145,7 @@ module.exports = {
       strapiVersion: strapi.config.info.strapi,
       adminVersion: strapi.config.info.version,
       manual,
+      dbEngine,
     };
   },
   zipFolderToFile: async (pathToFolder, pathToZipFile) => {

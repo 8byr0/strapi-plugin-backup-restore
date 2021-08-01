@@ -33,6 +33,12 @@
       "configurable": false,
       "required": true
     },
+    "dbEngine": {
+      "type": "string",
+      "private": true,
+      "configurable": false,
+      "required": false
+    },
     "identifier": {
       "type": "string",
       "private": true,
