@@ -2,7 +2,7 @@
 
 Add backup and restore features directly inside your strapi admin panel.
 
-![Alt text](assets/docs/manual_backup.png "Title")
+![Backup restore plugin dashboard](assets/docs/manual_backup.png "Backup restore plugin dashboard")
 
 Supported databases:
 
@@ -121,6 +121,9 @@ module.exports = {
   },
 };
 ```
+### Permissions
+![Backup restore plugin permissions setup](assets/docs/permissions.png "Backup restore plugin permissions setup")
+You can manage per-scope permissions directly from admin panel.
 
 ### Backup structure
 
