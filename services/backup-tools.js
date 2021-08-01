@@ -42,13 +42,13 @@ module.exports = {
       strapi.log.info("Backup directory created successfully!");
     });
 
+    const dbConnection =
+      strapi.config.database.connections[
+        strapi.config.database.defaultConnection
+      ];
+    const { settings } = dbConnection;
     if (backupDB) {
       // Backup database
-      const dbConnection =
-        strapi.config.database.connections[
-          strapi.config.database.defaultConnection
-        ];
-      const { settings } = dbConnection;
 
       switch (settings.client) {
         case "mysql":
