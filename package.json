@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-backup-restore",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "homepage": "https://github.com/8byr0/strapi-plugin-backup-restore#readme",
   "description": "Strapi plugin to Backup and restore easily your DB and files.",
   "strapi": {
