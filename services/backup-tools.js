@@ -117,7 +117,7 @@ async function backupPgDockerSocket(docker, settings, backupPath) {
   await dockerRequest(socket, `/exec/${data.Id}/start`, {Detach: false, Tty: false}, data => {
     if(firstLine) {
       firstLine = false;
-      const m = String(data).match(/pg_dump: error: (.+?)(?:[\r\n]|$)/);
+      const m = String(data).substr(0, 255).match(/(?:pg_dump: error|exec failed): (.+?)(?:[\r\n]|$)/);
       if(m) {
         throw new Error(m[1]);
       }
