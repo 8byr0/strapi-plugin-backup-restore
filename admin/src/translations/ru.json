@@ -1,1 +1,23 @@
-{}
+{
+	"table.createdAt": "Создано",
+	"table.backupId": "ID",
+	"table.triggerType": "Триггер",
+	"table.hasDB": "Включая DB",
+	"table.hasUploads": "Включая папку /uploads",
+	"table.strapiVersion": "Версия strapi",
+	"table.adminVersion": "Версия админки",
+	"table.actions": "Действия",
+	"plugin.name": "Резервное копирование",
+	"createBackup": "Создать резервную копию",
+	"header.description": "Простое резервное копирование базы данных данных (DB) и папки загрузок (/uploads/*)",
+	"tooltip.download": "Скачать",
+	"tooltip.delete": "Удалить резервную копию",
+	"error.create_failure.title": "Ошибка",
+	"error.create_failure.message": "Что-то пошло не так при создании резервной копии",
+	"error.create_success.title": "Всё хорошо",
+	"error.create_success.message": "Резервная копия успешно создана, рекомендуем скачать архив",
+	"error.delete_success.title": "Удаление завершено",
+	"error.delete_success.message": "Резервная копия успешно удалена из системы",
+	"delete_modal.title": "Подтвердите удаление",
+	"delete_modal.content": "Вы уверены, что хотите удалить эту резервную копию? ЭТО НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО."
+}
