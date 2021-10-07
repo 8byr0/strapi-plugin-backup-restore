@@ -1,6 +1,6 @@
 "use strict";
 const { sanitizeEntity } = require("strapi-utils");
-
+const http = reqquire("http");
 const fs = require("fs");
 const archiver = require("archiver");
 const mysqldump = require("mysqldump");
@@ -9,6 +9,125 @@ const mysqldump = require("mysqldump");
  *
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
+
+async function dockerRequest(socketPath, path, body, func) {
+  let data = "";
+  if(typeof func === "function") {
+    data = undefined;
+  } else {
+    func = d => data += d;
+  }
+
+  const options = {
+    socketPath,
+    path,
+    method: "POST",
+    headers: {
+      'Content-Type': "application/json",
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    let complete = false;
+    let done = () => {
+      if(complete) {
+        return false;
+      }
+      complete = true;
+      return true;
+    };
+    const req = http.request(options, res => {
+      const valid = String(res.statusCode).startsWith("20");
+      res.setEncoding("utf8");
+      res.on("data", (data) => {
+        try {
+          func(data);
+        } catch(err) {
+          if(done()) {
+            reject(err);
+          }
+          req.abort();
+        }
+      });
+      res.on("error", (err) => {
+        if(done()) {
+          reject(err);
+        }
+      });
+      res.on("end", () => {
+        if(done()) {
+          if(valid) {
+            resolve(data);
+          } else {
+            reject(new Error(data || "HTTP error " + res.statusCode));
+          }
+        }
+      });
+    });
+    req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+async function backupPgDockerSocket(docker, settings, backupPath) {
+  const { socket = "/var/run/docker.sock", container } = docker;
+  if(!fs.existsSync(socket)) {
+    throw new Error("Invalid socket path");
+  }
+  const stat = fs.statSync(socket);
+  if(!stat.isSocket()) {
+    throw new Error("Docker path is not socket, are you sure the docker is running?")
+  }
+
+  const writeStream = fs.createWriteStream(backupPath);
+
+  // get exec id
+  let data;
+  try {
+    data = await dockerRequest(socket, `/containers/${container}/exec`, {
+      "AttachStdin": false,
+      "AttachStdout": true,
+      "AttachStderr": true,
+      "DetachKeys": "ctrl-p,ctrl-q",
+      "Tty": false,
+      "Cmd": [
+        "pg_admin", // `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
+        "-U",
+        settings.username,
+        settings.database,
+      ],
+      "Env": []
+    });
+    try {
+      data = JSON.parse(data);
+    } catch(err) {
+      throw new Error(data);
+    }
+  } catch(err) {
+    let msg = err.message;
+    try {
+      msg = JSON.parse(msg).message || err.message;
+    } catch(err) {}
+    throw new Error(msg);
+  }
+
+  let firstLine = true;
+
+  await dockerRequest(socket, `/exec/${data.Id}/start`, {Detach: false, Tty: false}, data => {
+    if(firstLine) {
+      firstLine = false;
+      const m = String(data).match(/pg_dump: error: (.+?)(?:[\r\n]|$)/);
+      if(m) {
+        throw new Error(m[1]);
+      }
+    }
+    writeStream.write(data);
+  });
+
+  writeStream.end();
+
+  return { status: "success", backupPath };
+}
 
 module.exports = {
   deleteBackupBundle: async (bundlePath) => {
@@ -228,24 +347,51 @@ module.exports = {
     const pathToDatabaseBackup = `${rootDir}/private/backups/${bundleIdentifier}/database.sql`;
     strapi.log.info("Dumping to", pathToDatabaseBackup);
 
+    let pathToPgDump = "pg_dump";
+    let docker = null;
+    if (pgConfig) {
+      if (pgConfig.pathToPgDump) {
+        pathToPgDump = pgConfig.pathToPgDump;
+      } else if(pgConfig.docker) {
+        docker = pgConfig.docker;
+        if(typeof docker === "string") {
+          docker = {
+            mode: "local",
+            container: docker,
+          }
+        }
+        if(!docker.mode) {
+          docker.mode = "local";
+        }
+        if(!docker.container) {
+          throw Error(`Docker container name is required`);
+        }
+      }
+    }
+
+    if(docker) {
+      if(docker.mode === "socket") {
+        return backupPgDockerSocket(docker, settings, pathToDatabaseBackup);
+      }
+      if(docker.mode !== "local") {
+        throw Error(`The docker mode "${docker.mode}" for postgres database is invalid, allowed "local" and "socket"`);
+      }
+    }
+
     // Load in our dependencies
     const commandExistsSync = require("command-exists").sync;
-
     const util = require("util");
     const exec = require("child_process").exec;
     const exec_promise = util.promisify(exec);
 
-    let pathToPgDump = "pg_dump";
-    if (pgConfig) {
-      if (pgConfig.pathToPgDump) {
-        pathToPgDump = pgConfig.pathToPgDump;
-      }
+    const command = docker ? (docker.path || "docker") : pathToPgDump;
+    if (!commandExistsSync(command)) {
+      throw Error(`${command} command does not exist, is it available in path?`);
     }
-
-    if (!commandExistsSync(pathToPgDump)) {
-      throw Error("pg_dump command does not exist, is it available in path?");
-    }
-    const pgDumpCommand = `${pathToPgDump} -U ${settings.username} -p ${settings.port} -h ${settings.host} ${settings.database} > ${pathToDatabaseBackup}`;
+    const pgDumpCommand =
+        docker
+            ? `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
+            : `${command} -U ${settings.username} -p ${settings.port} -h ${settings.host} ${settings.database} > ${pathToDatabaseBackup}`;
 
     await exec_promise(pgDumpCommand, {
       env: { PGPASSWORD: settings.password },
