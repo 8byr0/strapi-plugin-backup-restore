@@ -9,7 +9,7 @@
 	"table.actions": "Действия",
 	"plugin.name": "Резервное копирование",
 	"createBackup": "Создать резервную копию",
-	"header.description": "Простое резервное копирование базы данных данных (DB) и папки загрузок (/uploads/*)",
+	"header.description": "Простое резервное копирование базы данных (DB) и папки загрузок (/uploads/*)",
 	"tooltip.download": "Скачать",
 	"tooltip.delete": "Удалить резервную копию",
 	"error.create_failure.title": "Ошибка",
@@ -19,5 +19,5 @@
 	"error.delete_success.title": "Удаление завершено",
 	"error.delete_success.message": "Резервная копия успешно удалена из системы",
 	"delete_modal.title": "Подтвердите удаление",
-	"delete_modal.content": "Вы уверены, что хотите удалить эту резервную копию? ЭТО НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО."
+	"delete_modal.content": "Вы уверены, что хотите удалить эту резервную копию? ЭТО ДЕЙСТВИЕ НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО."
 }
