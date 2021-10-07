@@ -92,7 +92,7 @@ async function backupPgDockerSocket(docker, settings, backupPath) {
       "DetachKeys": "ctrl-p,ctrl-q",
       "Tty": false,
       "Cmd": [
-        "pg_admin", // `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
+        "pg_dump", // `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
         "-U",
         settings.username,
         settings.database,
