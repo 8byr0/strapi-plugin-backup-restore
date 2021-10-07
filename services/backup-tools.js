@@ -10,7 +10,7 @@ const mysqldump = require("mysqldump");
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
-async function dockerRequest(socketPath, path, body, func) {
+async function dockerRequest(socketPath, path, body, func, writeStream) {
   let data = "";
   if(typeof func === "function") {
     data = undefined;
@@ -66,6 +66,9 @@ async function dockerRequest(socketPath, path, body, func) {
       });
     });
     req.write(JSON.stringify(body));
+    if(writeStream) {
+      req.pipe(writeStream);
+    }
     req.end();
   });
 }
@@ -122,8 +125,7 @@ async function backupPgDockerSocket(docker, settings, backupPath) {
         throw new Error(m[1]);
       }
     }
-    writeStream.write(data);
-  });
+  }, writeStream);
 
   writeStream.end();
 
