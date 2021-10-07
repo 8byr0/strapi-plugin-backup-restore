@@ -121,7 +121,7 @@ const HomePage = () => {
             fontSize="sm"
             ellipsis
           >
-            About
+            {formatMessage({ id: getTrad("about.title") })}
           </Text>
           <GitHubButton
             href="https://github.com/8byr0/strapi-plugin-backup-restore"
@@ -130,11 +130,7 @@ const HomePage = () => {
           >
             Star
           </GitHubButton>
-          <div>
-            This plugin is available on github, show your support by giving a
-            star! <br />
-            You can also open an issue if you face any problem.
-          </div>
+          <div dangerouslySetInnerHTML={{__html: formatMessage({ id: getTrad("about.htmlText") })}} />
         </div>
       )}
     </div>
