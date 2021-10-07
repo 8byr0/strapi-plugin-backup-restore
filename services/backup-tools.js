@@ -10,6 +10,10 @@ const mysqldump = require("mysqldump");
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
+function isSock(socket) {
+  return !/https?:/.test(socket);
+}
+
 async function dockerRequest(socketPath, path, body, func, writeStream) {
   let data = "";
   if(typeof func === "function") {
@@ -19,13 +23,19 @@ async function dockerRequest(socketPath, path, body, func, writeStream) {
   }
 
   const options = {
-    socketPath,
-    path,
     method: "POST",
     headers: {
       'Content-Type': "application/json",
     }
   };
+
+  let url = "";
+  if(isSock(socketPath)) {
+    options.socketPath = socketPath;
+    options.path = path;
+  } else {
+    url = socketPath + (url.endsWith("/") ? path.substr(1) : path);
+  }
 
   let complete = false;
   let done = () => {
@@ -36,10 +46,13 @@ async function dockerRequest(socketPath, path, body, func, writeStream) {
     return true;
   };
 
-  return new Promise((resolve, reject) => {
-    const req = http.request(options, res => {
+  const query = (resolve, reject, abort) => {
+    return (res) => {
       const valid = String(res.statusCode).startsWith("20");
       res.setEncoding("utf8");
+      if(valid && writeStream) {
+        res.pipe(writeStream);
+      }
       res.on("data", (data) => {
         try {
           func(data);
@@ -47,7 +60,7 @@ async function dockerRequest(socketPath, path, body, func, writeStream) {
           if(done()) {
             reject(err);
           }
-          req.abort();
+          abort();
         }
       });
       res.on("error", (err) => {
@@ -64,29 +77,47 @@ async function dockerRequest(socketPath, path, body, func, writeStream) {
           }
         }
       });
-    });
+    };
+  };
+
+  return new Promise((resolve, reject) => {
+    const abort = () => { req.destroy(); };
+    const req = url
+        ? http.request(url, options, query(resolve, reject, abort))
+        : http.request(options, query(resolve, reject, abort))
+    ;
     req.write(JSON.stringify(body));
-    if(writeStream) {
-      req.pipe(writeStream);
-    }
     req.end();
   });
 }
 
 async function backupPgDockerSocket(docker, settings, backupPath) {
-  const { socket = "/var/run/docker.sock", container } = docker;
-  if(!fs.existsSync(socket)) {
-    throw new Error("Invalid socket path");
-  }
-  const stat = fs.statSync(socket);
-  if(!stat.isSocket()) {
-    throw new Error("Docker path is not socket, are you sure the docker is running?")
+  const { socket = "/var/run/docker.sock", container, file } = docker;
+  const isFile = file === true || typeof file === "function";
+
+  if(isSock(socket)) {
+    if(!fs.existsSync(socket)) {
+      throw new Error("Invalid socket path");
+    }
+    const stat = fs.statSync(socket);
+    if(!stat.isSocket()) {
+      throw new Error("Docker path is not socket, are you sure the docker is running?")
+    }
   }
 
-  const writeStream = fs.createWriteStream(backupPath);
+  const writeStream = isFile ? undefined : fs.createWriteStream(backupPath);
 
   // get exec id
   let data;
+  const cmd = [
+    "pg_dump", // `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
+    "-U",
+    settings.username,
+    settings.database,
+  ];
+  if(isFile) {
+    cmd.push("-f", typeof file === "function" ? file(backupPath) : backupPath);
+  }
   try {
     data = await dockerRequest(socket, `/containers/${container}/exec`, {
       "AttachStdin": false,
@@ -94,12 +125,7 @@ async function backupPgDockerSocket(docker, settings, backupPath) {
       "AttachStderr": true,
       "DetachKeys": "ctrl-p,ctrl-q",
       "Tty": false,
-      "Cmd": [
-        "pg_dump", // `${command} exec ${docker.container} pg_dump -U ${settings.username} ${settings.database} > ${pathToDatabaseBackup}`
-        "-U",
-        settings.username,
-        settings.database,
-      ],
+      "Cmd": cmd,
       "Env": []
     });
     try {
@@ -127,7 +153,13 @@ async function backupPgDockerSocket(docker, settings, backupPath) {
     }
   }, writeStream);
 
-  writeStream.end();
+  if(writeStream) {
+    writeStream.end();
+  }
+
+  if(isFile && !fs.existsSync(backupPath)) {
+    throw new Error("Invalid file path, no data output");
+  }
 
   return { status: "success", backupPath };
 }
