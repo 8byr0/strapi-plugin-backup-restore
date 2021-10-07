@@ -1,6 +1,6 @@
 "use strict";
 const { sanitizeEntity } = require("strapi-utils");
-const http = reqquire("http");
+const http = require("http");
 const fs = require("fs");
 const archiver = require("archiver");
 const mysqldump = require("mysqldump");
@@ -27,15 +27,16 @@ async function dockerRequest(socketPath, path, body, func) {
     }
   };
 
+  let complete = false;
+  let done = () => {
+    if(complete) {
+      return false;
+    }
+    complete = true;
+    return true;
+  };
+
   return new Promise((resolve, reject) => {
-    let complete = false;
-    let done = () => {
-      if(complete) {
-        return false;
-      }
-      complete = true;
-      return true;
-    };
     const req = http.request(options, res => {
       const valid = String(res.statusCode).startsWith("20");
       res.setEncoding("utf8");
