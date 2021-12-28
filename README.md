@@ -1,7 +1,12 @@
 # Strapi Backup & Restore plugin
-
 Add backup and restore features directly inside your strapi admin panel.
 
+## ⚠️ READ FIRST ⚠️
+- This plugin is not actively maintained (I'm definitely open to PR but lack of time)
+- Compatibility with strapi v4 is not available (only v3 is currently supported)
+
+
+## Overview
 ![Backup restore plugin dashboard](assets/docs/manual_backup.png "Backup restore plugin dashboard")
 
 Supported databases:
