@@ -82,12 +82,33 @@ You can manually specify pg_dump path in plugin config like so:
 ```javascript
 // config/plugins.js
 module.exports = () => ({
-  "backup-restore": {
-    postgres: {
-      // Update with your path
-      pathToPgDump: "/usr/local/opt/libpq/bin/pg_dump",
-    },
-  },
+	"backup-restore": {
+		postgres: {
+			// Update with your path
+			pathToPgDump: "/usr/local/opt/libpq/bin/pg_dump",
+		},
+	},
+});
+// docker variant:
+module.exports = () => ({
+	"backup-restore": {
+		postgres: {
+			docker: "container-name", // eq. { mode: "local", container: "container-name" }
+			// or
+			docker: {
+				mode: "local",
+				container: "container-name",
+				path: "docker", // path to command. Not required, default = "docker"
+			},
+			// or
+			docker: {
+				mode: "socket",
+				container: "container-name",
+				socket: "http://socket-url", // not required, default = "/var/run/docker.sock"
+				file: true, // boolean or function (originPath: string) => string;
+			}
+		},
+	},
 });
 ```
 

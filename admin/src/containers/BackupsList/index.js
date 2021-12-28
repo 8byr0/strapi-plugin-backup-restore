@@ -150,11 +150,6 @@ const BackupLists = ({ backups, onDelete }) => {
 
   return (
     <div>
-      <Text lineHeight="6" fontSize="sm" ellipsis>
-        This version can handle backup for <b>MySQL</b>, <b>Postgres</b> and{" "}
-        <b>Sqlite3</b>. The restore feature and mongo support will come in next
-        versions.
-      </Text>
       <Text
         textTransform="capitalize"
         lineHeight="6"
@@ -162,7 +157,7 @@ const BackupLists = ({ backups, onDelete }) => {
         fontSize="lg"
         ellipsis
       >
-        Backups list
+        {formatMessage({ id: getTrad("backupsList") })}
       </Text>
       <Table
         className="remove-margin"
